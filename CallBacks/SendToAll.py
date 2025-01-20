@@ -1,0 +1,50 @@
+from telegram import CallbackQuery, InlineKeyboardButton, Update
+from CallBacks.BaseClass import BaseClassAction
+from telegram.ext import CallbackContext, MessageHandler, filters
+from telegram.error import TelegramError
+from config import ADMIN_ID
+from utils import is_admin
+from Database import db, User
+
+class SendToAll(BaseClassAction):
+    def __init__(self, step_conversation, callback_data):
+        super().__init__(step_conversation=step_conversation,
+                         callback_data=callback_data)
+        
+    def on_conv_step(self, steps : dict):
+        steps[self.step_conversation] = [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, self.on_receive_input),
+            ]
+        
+        return steps
+        
+    def on_menu_generate(self, keys : list):
+        keyboard = [InlineKeyboardButton("Send Message To All", callback_data=self.callback_data)]
+        
+        keys.append(keyboard)
+        return keys
+
+    async def on_query_receive(self, query : CallbackQuery,update: Update, context: CallbackContext):
+        await query.edit_message_text("Enter your Message:")
+        
+        return self.step_conversation
+        
+    async def on_receive_input(self,update: Update, context: CallbackContext):
+        if not is_admin(update.message.from_user.id, ADMIN_ID):
+            return
+        
+        users = []  # Get your user data here
+    
+        with db.session_scope() as session:
+            users = session.query(User).all()
+            
+        message = update.message.text
+        await update.message.reply_text(f"Your Message: \n{message}")
+        sending = await update.message.reply_text("Sending To All ...")
+        
+        for user in users:
+            user_id = user.telegramId
+            try:
+                context.bot.send_message(chat_id=user_id, text=message)
+            except TelegramError as e:
+                print(f"Error sending message to {user_id}: {e}")
