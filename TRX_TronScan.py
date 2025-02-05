@@ -46,7 +46,8 @@ class TRX_TronScan:
             except Exception as ex:
                 print(ex)
 
-            time.sleep(os.getenv("TRON_SCAN_PRIOD",60))
+            sleep = int(os.getenv("TRON_SCAN_PRIOD",60))
+            time.sleep(sleep)
 
     def fetch_transactions(self, last_timestamp, wallet_address):
         params = {
