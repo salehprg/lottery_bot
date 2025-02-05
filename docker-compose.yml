@@ -10,6 +10,8 @@ services:
       DB_NAME: LotteryBotDB
     depends_on:
       - db
+    networks:
+      - app-network
 
   # PostgreSQL Database Service
   db:
@@ -22,7 +24,12 @@ services:
       POSTGRES_DB: LotteryBotDB
     volumes:
       - postgres_data:/var/lib/postgresql/data  # Persist database data
+    networks:
+      - app-network
+      
+networks:
+  app-network:
+    driver: bridge
 
-# Define a volume to persist PostgreSQL data
 volumes:
   postgres_data:
