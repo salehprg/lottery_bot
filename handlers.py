@@ -1,6 +1,6 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import CallbackContext
-from config import ADMIN_ID, WALLET_ADDRESS
+from config import ADMIN_ID
 from utils import is_admin, export_to_excel
 from Database.database import db,User, Wallet
 from CallBacks import *

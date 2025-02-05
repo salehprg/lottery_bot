@@ -6,7 +6,6 @@ from typing import List
 
 # Configuration
 TRONSCAN_API_URL = "https://shastapi.tronscan.org/api/trx/transfer"
-# YOUR_WALLET_ADDRESS = "TTcv9QtuHSYsEJpLbL7M4uCbsWBoW8ZkzY"  # Replace with your Tron wallet address
 
 class TRX_TronScan:
     def __init__(self):
