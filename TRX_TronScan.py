@@ -1,4 +1,5 @@
 import datetime
+import os
 import requests
 import time
 from Database import db, Settings, Transaction, Wallet
@@ -45,7 +46,7 @@ class TRX_TronScan:
             except Exception as ex:
                 print(ex)
 
-            time.sleep(5)
+            time.sleep(os.getenv("TRON_SCAN_PRIOD",60))
 
     def fetch_transactions(self, last_timestamp, wallet_address):
         params = {
