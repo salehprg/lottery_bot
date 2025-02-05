@@ -2,9 +2,6 @@ from telegram import CallbackQuery, InlineKeyboardButton, Update
 from telegram.constants import ParseMode
 from CallBacks.BaseClass import BaseClassAction
 from telegram.ext import CallbackContext, MessageHandler, filters
-from telegram.error import TelegramError
-from config import ADMIN_ID
-from utils import is_admin
 from Database import db, Settings
 
 class BuyChance(BaseClassAction):

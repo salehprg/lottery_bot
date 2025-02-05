@@ -2,7 +2,6 @@ from telegram import CallbackQuery, InlineKeyboardButton, Update
 from CallBacks.BaseClass import BaseClassAction
 from telegram.ext import CallbackContext, ConversationHandler, MessageHandler, filters
 from Database.database import db,User
-from config import ADMIN_ID
 from utils import export_to_excel, is_admin
 
 class ExportUserData(BaseClassAction):

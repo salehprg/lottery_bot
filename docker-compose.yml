@@ -1,0 +1,26 @@
+services:
+  # Python Application Service
+  tg_bot:
+    build: .
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: 123456
+      DB_NAME: LotteryBotDB
+    depends_on:
+      - db
+
+  # PostgreSQL Database Service
+  db:
+    image: postgres:13  # Use the official PostgreSQL image
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persist database data
+
+# Define a volume to persist PostgreSQL data
+volumes:
+  postgres_data:

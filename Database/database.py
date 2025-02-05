@@ -1,3 +1,4 @@
+import os
 import uuid
 from sqlalchemy import UUID, DateTime, Integer, Column, String,Double, create_engine, ForeignKey, func
 from sqlalchemy.orm import relationship, joinedload, subqueryload, Session,sessionmaker
@@ -19,12 +20,14 @@ class Settings(Base):
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     walletAddress = Column(String)
+    lastTimeStampPull = Column(Double)
+    lastBlockId = Column(Integer)
 
 class Transaction(Base):
     __tablename__ = "Transactions"
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    walletId = Column(UUID(as_uuid=True), ForeignKey('Wallets.id'), nullable=False)
+    walletId = Column(UUID(as_uuid=True), ForeignKey('Wallets.id'), nullable=True)
     txn_id = Column(String)
     from_wallet = Column(String)
     to_wallet = Column(String)
@@ -39,6 +42,7 @@ class Wallet(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     userId = Column(UUID(as_uuid=True), ForeignKey('Users.id'), nullable=False)
     balance = Column(Double)
+    current_walletaddress = Column(String)
     
     transactions = relationship("Transaction", back_populates="wallet")
     user = relationship("User", back_populates="wallet")
@@ -84,6 +88,7 @@ class Database:
             if exist_setting == None:
                 settings = Settings()
                 settings.walletAddress = ""
+                settings.lastTimeStampPull = 0
                 
                 session.add(settings)
                 session.commit()
@@ -101,7 +106,7 @@ class Database:
         return cls._instance
     
     @contextmanager
-    def session_scope(self):
+    def session_scope(self, close = True):
         """Provide a transactional scope around a series of operations."""
         session = self.SessionLocal()
         try:
@@ -111,7 +116,14 @@ class Database:
             session.rollback()
             raise
         finally:
-            session.close()
+            if close:
+                session.close()
             
-            
-db = Database("postgres", "Saleh-1379", "127.0.0.1", "5432", "LotteryBotDB")
+
+db_host = os.getenv('DB_HOST', "localhost")
+db_port = os.getenv('DB_PORT', 5432)
+db_user = os.getenv('DB_USER', "postgres")
+db_password = os.getenv('DB_PASSWORD', "12345678")
+db_name = os.getenv('DB_NAME', "LotteryBotDB")
+
+db = Database(db_user, db_password, db_host, db_port, db_name)

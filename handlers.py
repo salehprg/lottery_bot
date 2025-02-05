@@ -32,6 +32,8 @@ async def start(update: Update, context: CallbackContext):
             new_wallet.balance = 0
             new_wallet.userId = new_user.id
             session.add(new_wallet)
+
+    await show_menu(update, context)
             
     
 
@@ -52,6 +54,7 @@ async def user_panel(update: Update, context: CallbackContext):
     keyboard =[]
     
     userProfile.on_menu_generate(keyboard)
+    wallet.on_menu_generate(keyboard)
     buyChance.on_menu_generate(keyboard)
     
     reply_markup = InlineKeyboardMarkup(keyboard)

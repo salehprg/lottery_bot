@@ -1,6 +1,8 @@
 # bot.py
+import threading
 from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import ContextTypes, ConversationHandler,CallbackContext, CallbackQueryHandler, Application,CommandHandler
+from TRX_TronScan import TRX_TronScan
 from config import TOKEN
 from CallBacks import *
 from handlers import show_menu, start
@@ -72,4 +74,14 @@ def main():
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
-    main()
+    trx_payment = TRX_TronScan()
+    scheduler_tron = threading.Thread(target=trx_payment.start_pulling)
+    scheduler_tron.start()
+
+    while True:
+        try:
+            main()
+        except Exception as ex:
+            print(ex)
+
+    scheduler_tron.join()

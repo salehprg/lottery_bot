@@ -1,10 +1,8 @@
 from telegram import CallbackQuery, InlineKeyboardButton, Update
 from CallBacks.BaseClass import BaseClassAction
 from telegram.ext import CallbackContext, MessageHandler, filters
-from telegram.error import TelegramError
-from config import ADMIN_ID
-from utils import is_admin
 from Database import db, User,Wallet
+from telegram.ext import ConversationHandler
 
 class UserProfile(BaseClassAction):
     def __init__(self, step_conversation, callback_data):
@@ -38,7 +36,7 @@ class UserProfile(BaseClassAction):
 
         await update.effective_chat.send_message(profileinfo)
         
-        return self.step_conversation
+        return ConversationHandler.END
         
     async def on_receive_input(self,update: Update, context: CallbackContext):
         pass
