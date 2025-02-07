@@ -3,10 +3,9 @@ from CallBacks.BaseClass import BaseClassAction
 from telegram.ext import CallbackContext, MessageHandler, filters, ConversationHandler, CallbackQueryHandler, ContextTypes, Application
 
 from Database.database import Wallet
-from config import ADMIN_ID
-from utils import is_admin
 
 from Database import db, Settings, User
+from Config import Configs
 
 class SetWallet(BaseClassAction):
     def __init__(self, step_conversation, callback_data):
@@ -71,7 +70,7 @@ class SetWallet(BaseClassAction):
             
             with db.session_scope() as session:
 
-                if not is_admin(update.message.from_user.id, ADMIN_ID):
+                if not Configs.is_admin(update.message.from_user.id, Configs.ADMIN_ID):
                     user = session.query(User).filter_by(telegramId=f"{user_id}").one_or_none()
                     if user != None:
                         wallet = session.query(Wallet).filter_by(userId=user.id).one_or_none()

@@ -20,12 +20,7 @@ class BuyChance(BaseClassAction):
         states = {}
         self.on_conv_step(states)
 
-        application.add_handler(ConversationHandler(
-            entry_points=[CallbackQueryHandler(self.on_query_receive, pattern=self.callback_pattern)],  # The conversation is triggered by the inline button, not a direct command
-            states=states,
-            fallbacks=[CallbackQueryHandler(self.cancel)],
-            per_message=False
-        ))
+        application.add_handler(CallbackQueryHandler(self.on_query_receive, pattern=self.callback_pattern))
 
     def on_menu_generate(self, keys : list):
         keyboard = [InlineKeyboardButton("Buy Chance", callback_data=self.callback_data)]
@@ -46,9 +41,12 @@ class BuyChance(BaseClassAction):
 
             profileinfo = f"""هر شانس معادل 1TRON میباشد لطفا مبلغ معادل را به کیف پول زیر واریز نمایید:\nکیف پول:`{settings.walletAddress}`"""
 
-        await update.effective_chat.send_message(profileinfo, parse_mode=ParseMode.MARKDOWN_V2)
+        await update.callback_query.edit_message_text(profileinfo, parse_mode=ParseMode.MARKDOWN_V2)
         
-        return self.step_conversation
+        if self.cancel is not None:
+            return await self.cancel(update, context)
+        
+        return ConversationHandler.END
         
     async def on_receive_input(self,update: Update, context: CallbackContext):
         pass

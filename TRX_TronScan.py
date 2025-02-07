@@ -21,8 +21,8 @@ class TRX_TronScan:
     def start_pulling(self):
         print("Starting Tron payment system...")
         while True:
+            session = db.SessionLocal()
             try:
-                session = db.SessionLocal()
                 settings = self.get_last_timestamp(session)
                 print("Polling for new transactions...")
                 transactions = self.fetch_transactions(settings.lastTimeStampPull, settings.walletAddress)
@@ -44,6 +44,7 @@ class TRX_TronScan:
 
                     session.commit()
             except Exception as ex:
+                session.rollback()
                 print(ex)
 
             sleep = int(os.getenv("TRON_SCAN_PRIOD",60))

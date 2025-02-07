@@ -9,6 +9,7 @@ services:
       DB_PASSWORD: 123456
       DB_NAME: LotteryBotDB
       TRON_SCAN_PRIOD: 60
+      SAVE_DIR_PATH: "/save_path"
     depends_on:
       - db
     networks:

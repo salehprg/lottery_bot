@@ -3,9 +3,8 @@ from CallBacks.BaseClass import BaseClassAction
 from telegram.ext import CallbackContext, MessageHandler, filters, Application, CallbackQueryHandler, ConversationHandler
 from telegram.error import TelegramError
 from Domain.DTOs.UserDTO import UserDTO
-from config import ADMIN_ID
-from utils import is_admin
 from Database import db, User
+from Config import Configs
 
 class SendToAll(BaseClassAction):
     def __init__(self, step_conversation, callback_data):
@@ -44,7 +43,7 @@ class SendToAll(BaseClassAction):
         return self.step_conversation
         
     async def on_receive_input(self,update: Update, context: CallbackContext):
-        if not is_admin(update.message.from_user.id, ADMIN_ID):
+        if not Configs.is_admin(update.message.from_user.id, Configs.ADMIN_ID):
             return
         
         users_dto = []
