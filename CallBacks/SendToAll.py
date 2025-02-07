@@ -1,7 +1,8 @@
 from telegram import CallbackQuery, InlineKeyboardButton, Update
 from CallBacks.BaseClass import BaseClassAction
-from telegram.ext import CallbackContext, MessageHandler, filters
+from telegram.ext import CallbackContext, MessageHandler, filters, Application, CallbackQueryHandler, ConversationHandler
 from telegram.error import TelegramError
+from Domain.DTOs.UserDTO import UserDTO
 from config import ADMIN_ID
 from utils import is_admin
 from Database import db, User
@@ -15,8 +16,21 @@ class SendToAll(BaseClassAction):
         steps[self.step_conversation] = [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, self.on_receive_input),
             ]
-        
+
         return steps
+    
+    def create_handlers(self, application : Application, cancel):
+        self.cancel = cancel
+
+        states = {}
+        states = self.on_conv_step(states)
+
+        application.add_handler(ConversationHandler(
+            entry_points=[CallbackQueryHandler(self.on_query_receive, pattern=self.callback_pattern)],  # The conversation is triggered by the inline button, not a direct command
+            states=states,
+            fallbacks=[CallbackQueryHandler(self.cancel)],
+            per_message=False
+        ))
         
     def on_menu_generate(self, keys : list):
         keyboard = [InlineKeyboardButton("Send Message To All", callback_data=self.callback_data)]
@@ -24,8 +38,8 @@ class SendToAll(BaseClassAction):
         keys.append(keyboard)
         return keys
 
-    async def on_query_receive(self, query : CallbackQuery,update: Update, context: CallbackContext):
-        await query.edit_message_text("Enter your Message:")
+    async def on_query_receive(self,update: Update, context: CallbackContext):
+        await update.callback_query.edit_message_text("Enter your Message:")
         
         return self.step_conversation
         
@@ -33,18 +47,19 @@ class SendToAll(BaseClassAction):
         if not is_admin(update.message.from_user.id, ADMIN_ID):
             return
         
-        users = []  # Get your user data here
+        users_dto = []
     
         with db.session_scope() as session:
             users = session.query(User).all()
+            users_dto = [UserDTO(user.id, user.telegramId, user.inviteby_telegramId, user.joinDate) for user in users]
             
         message = update.message.text
         await update.message.reply_text(f"Your Message: \n{message}")
         sending = await update.message.reply_text("Sending To All ...")
         
-        for user in users:
+        for user in users_dto:
             user_id = user.telegramId
             try:
-                context.bot.send_message(chat_id=user_id, text=message)
+                await context.bot.send_message(chat_id=user_id, text=message)
             except TelegramError as e:
                 print(f"Error sending message to {user_id}: {e}")

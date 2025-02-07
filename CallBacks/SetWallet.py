@@ -1,6 +1,6 @@
 from telegram import CallbackQuery, InlineKeyboardButton, Update
 from CallBacks.BaseClass import BaseClassAction
-from telegram.ext import CallbackContext, MessageHandler, filters
+from telegram.ext import CallbackContext, MessageHandler, filters, ConversationHandler, CallbackQueryHandler, ContextTypes, Application
 
 from Database.database import Wallet
 from config import ADMIN_ID
@@ -14,6 +14,19 @@ class SetWallet(BaseClassAction):
                          callback_data=callback_data)
         
         self.agree_step = int(f"{self.step_conversation}1")
+    
+    def create_handlers(self, application : Application, cancel):
+        self.cancel = cancel
+
+        states = {}
+        states = self.on_conv_step(states)
+
+        application.add_handler(ConversationHandler(
+            entry_points=[CallbackQueryHandler(self.on_query_receive, pattern=self.callback_pattern)],  # The conversation is triggered by the inline button, not a direct command
+            states=states,
+            fallbacks=[CallbackQueryHandler(self.cancel)],
+            per_message=False
+        ))
         
     def on_conv_step(self, steps : dict):
         steps[self.step_conversation] = [
@@ -31,8 +44,8 @@ class SetWallet(BaseClassAction):
         keys.append(wallet_key)
         return keys
 
-    async def on_query_receive(self, query : CallbackQuery,update: Update, context: CallbackContext):
-        await query.edit_message_text("Enter your wallet Address:")
+    async def on_query_receive(self,update: Update, context: CallbackContext):
+        await update.callback_query.edit_message_text("Enter your wallet Address:")
         
         return self.agree_step
 
@@ -68,3 +81,8 @@ class SetWallet(BaseClassAction):
                     settings.walletAddress = new_wallet_address
             
             await update.message.reply_text(f"Wallet address updated to {new_wallet_address}")
+
+        if self.cancel is not None:
+            return await self.cancel(update, context)
+        
+        return ConversationHandler.END

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from telegram import CallbackQuery, Update
-from telegram.ext import CallbackContext
+from telegram.ext import CallbackContext, Application
 
 class BaseClassAction(ABC):
 
@@ -9,9 +9,15 @@ class BaseClassAction(ABC):
         super().__init__()
         self.step_conversation = step_conversation
         self.callback_data = callback_data
+        self.cancel = None
+        self.callback_pattern = "^" + self.callback_data + "$"
 
     @abstractmethod
     def on_conv_step(self, steps : dict):
+        pass
+
+    @abstractmethod
+    def create_handlers(self, application : Application, cancel):
         pass
     
     @abstractmethod

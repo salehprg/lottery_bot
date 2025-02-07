@@ -33,7 +33,7 @@ async def start(update: Update, context: CallbackContext):
     
 
 async def show_menu(update: Update, context: CallbackContext):
-    user_id = update.message.from_user.id
+    user_id = update.effective_user.id
     if is_admin(user_id, ADMIN_ID):
         await admin_panel(update, context)
     else:
@@ -53,7 +53,10 @@ async def user_panel(update: Update, context: CallbackContext):
     buyChance.on_menu_generate(keyboard)
     
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text("Welcome to the User Panel. Choose an action:", reply_markup=reply_markup)
+    if update.callback_query:
+        await update.callback_query.message.chat.send_message("Welcome to the User Panel. Choose an action:", reply_markup=reply_markup)
+    else:
+        await update.message.reply_text("Welcome to the User Panel. Choose an action:", reply_markup=reply_markup)
 
 async def admin_panel(update: Update, context: CallbackContext):
     keyboard = []
@@ -63,4 +66,6 @@ async def admin_panel(update: Update, context: CallbackContext):
     sendToAll.on_menu_generate(keyboard)
     
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text("Welcome to the Admin Panel. Choose an action:", reply_markup=reply_markup)
+    message = update.callback_query if update.callback_query is not None else update.message
+
+    await message.reply_text("Welcome to the Admin Panel. Choose an action:", reply_markup=reply_markup)

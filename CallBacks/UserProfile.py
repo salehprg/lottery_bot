@@ -1,8 +1,7 @@
 from telegram import CallbackQuery, InlineKeyboardButton, Update
 from CallBacks.BaseClass import BaseClassAction
-from telegram.ext import CallbackContext, MessageHandler, filters
+from telegram.ext import CallbackContext, MessageHandler, filters, Application, ConversationHandler, CallbackQueryHandler
 from Database import db, User,Wallet
-from telegram.ext import ConversationHandler
 
 class UserProfile(BaseClassAction):
     def __init__(self, step_conversation, callback_data):
@@ -11,14 +10,18 @@ class UserProfile(BaseClassAction):
         
     def on_conv_step(self, steps : dict):
         pass
-        
+    
+    def create_handlers(self, application : Application, cancel):
+        self.cancel = cancel
+        application.add_handler(CallbackQueryHandler(self.on_query_receive, pattern=self.callback_pattern))
+
     def on_menu_generate(self, keys : list):
         keyboard = [InlineKeyboardButton("My Profile", callback_data=self.callback_data)]
         
         keys.append(keyboard)
         return keys
 
-    async def on_query_receive(self, query : CallbackQuery, update: Update, context: CallbackContext):
+    async def on_query_receive(self, update: Update, context: CallbackContext):
         
         user_id = update.effective_user.id
         
@@ -34,7 +37,7 @@ class UserProfile(BaseClassAction):
 
             profileinfo = f"""شماره کاربر: {user.telegramId}\nموجودی: {wallet.balance}"""
 
-        await update.effective_chat.send_message(profileinfo)
+        await update.callback_query.edit_message_text(profileinfo)
         
         return ConversationHandler.END
         

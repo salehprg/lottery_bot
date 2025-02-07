@@ -1,7 +1,7 @@
 from telegram import CallbackQuery, InlineKeyboardButton, Update
 from telegram.constants import ParseMode
 from CallBacks.BaseClass import BaseClassAction
-from telegram.ext import CallbackContext, MessageHandler, filters
+from telegram.ext import CallbackContext, MessageHandler, filters,Application,CallbackQueryHandler,ConversationHandler
 from Database import db, Settings
 
 class BuyChance(BaseClassAction):
@@ -13,14 +13,27 @@ class BuyChance(BaseClassAction):
         steps[self.step_conversation] = [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, self.on_receive_input),
             ]
-        
+    
+    def create_handlers(self, application : Application, cancel):
+        self.cancel = cancel
+
+        states = {}
+        self.on_conv_step(states)
+
+        application.add_handler(ConversationHandler(
+            entry_points=[CallbackQueryHandler(self.on_query_receive, pattern=self.callback_pattern)],  # The conversation is triggered by the inline button, not a direct command
+            states=states,
+            fallbacks=[CallbackQueryHandler(self.cancel)],
+            per_message=False
+        ))
+
     def on_menu_generate(self, keys : list):
         keyboard = [InlineKeyboardButton("Buy Chance", callback_data=self.callback_data)]
         
         keys.append(keyboard)
         return keys
 
-    async def on_query_receive(self, query : CallbackQuery, update: Update, context: CallbackContext):
+    async def on_query_receive(self, update: Update, context: CallbackContext):
         
         user_id = update.effective_user.id
         
