@@ -8,7 +8,7 @@ from TRX_TronScan import TRX_TronScan
 from CallBacks import *
 from handlers import show_menu, start
 from Config import Configs
-
+from Database import db, Settings
 
 async def cancel(update: Update, context: ContextTypes) -> int:
 
@@ -21,6 +21,12 @@ def main():
     os.makedirs(save_path,exist_ok=True)
 
     Configs.save_path = save_path
+
+    with db.session_scope() as session:
+        settings = session.query(Settings).one_or_none()
+        if settings is not None:
+            for adminId in settings.adminIds:
+                Configs.ADMIN_ID_LIST.append(adminId)
     
     print("Starting...")
     application = Application.builder().token(Configs.TOKEN).build()
@@ -34,6 +40,8 @@ def main():
     buyChance.create_handlers(application, cancel)
     getTransactions.create_handlers(application, cancel)
     userData.create_handlers(application, cancel)
+    startLottery.create_handlers(application, cancel)
+    getCurrentLottery.create_handlers(application, cancel)
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("menu", show_menu))

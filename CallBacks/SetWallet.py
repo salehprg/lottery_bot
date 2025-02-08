@@ -49,9 +49,6 @@ class SetWallet(BaseClassAction):
         return self.agree_step
 
     async def on_receive_agree(self,update: Update, context: CallbackContext):
-        # if not is_admin(update.message.from_user.id, ADMIN_ID):
-        #     return
-
         new_wallet_address = update.message.text
         
         context.user_data["wallet"] = new_wallet_address
@@ -70,7 +67,7 @@ class SetWallet(BaseClassAction):
             
             with db.session_scope() as session:
 
-                if not Configs.is_admin(update.message.from_user.id, Configs.ADMIN_ID):
+                if not Configs.is_admin(update.message.from_user.id):
                     user = session.query(User).filter_by(telegramId=f"{user_id}").one_or_none()
                     if user != None:
                         wallet = session.query(Wallet).filter_by(userId=user.id).one_or_none()

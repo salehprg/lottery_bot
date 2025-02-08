@@ -1,9 +1,10 @@
 import os
 import uuid
-from sqlalchemy import UUID, DateTime, Integer, Column, String,Double, create_engine, ForeignKey, func
+from sqlalchemy import ARRAY, UUID, DateTime, Integer, Column, String,Double, create_engine, ForeignKey, func
 from sqlalchemy.orm import relationship, joinedload, subqueryload, Session,sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from contextlib import contextmanager
+from sqlalchemy.dialects import postgresql
 
 Base = declarative_base()
 
@@ -14,7 +15,20 @@ class Lottery(Base):
     startDate = Column(DateTime(timezone=False))
     poolSize = Column(Double)
     userCount = Column(Integer)
+
+    users = relationship("LotteryUser", back_populates="lottery")
     
+class LotteryUser(Base):
+    __tablename__ = "LotteryUsers"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    userId = Column(UUID(as_uuid=True), ForeignKey('Users.id'), nullable=False)
+    lotteryId = Column(UUID(as_uuid=True), ForeignKey('Lotteries.id'), nullable=False)
+    ticketAmount = Column(Double)
+    
+    lottery = relationship("Lottery", back_populates="users")
+    user = relationship("User", back_populates="lotteries")
+
 class Settings(Base):
     __tablename__ = "Settings"
     
@@ -22,6 +36,7 @@ class Settings(Base):
     walletAddress = Column(String)
     lastTimeStampPull = Column(Double)
     lastBlockId = Column(Integer)
+    adminIds = Column(postgresql.ARRAY(Integer))
 
 class Transaction(Base):
     __tablename__ = "Transactions"
@@ -56,7 +71,8 @@ class User(Base):
     joinDate = Column(DateTime(timezone=False), server_default=func.now())
     
     wallet = relationship("Wallet", back_populates="user")
-    
+    lotteries = relationship("LotteryUser", back_populates="user")
+
     
 
 class Database:
@@ -89,6 +105,7 @@ class Database:
                 settings = Settings()
                 settings.walletAddress = ""
                 settings.lastTimeStampPull = 0
+                settings.adminIds = []
                 
                 session.add(settings)
                 session.commit()

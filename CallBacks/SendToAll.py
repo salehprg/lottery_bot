@@ -43,7 +43,7 @@ class SendToAll(BaseClassAction):
         return self.step_conversation
         
     async def on_receive_input(self,update: Update, context: CallbackContext):
-        if not Configs.is_admin(update.message.from_user.id, Configs.ADMIN_ID):
+        if not Configs.is_admin(update.message.from_user.id):
             return
         
         users_dto = []

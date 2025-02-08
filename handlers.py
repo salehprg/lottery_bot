@@ -33,7 +33,7 @@ async def start(update: Update, context: CallbackContext):
 
 async def show_menu(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
-    if Configs.is_admin(user_id, Configs.ADMIN_ID):
+    if Configs.is_admin(user_id):
         await admin_panel(update, context)
     else:
         await user_panel(update, context)
@@ -50,6 +50,7 @@ async def user_panel(update: Update, context: CallbackContext):
     userProfile.on_menu_generate(keyboard)
     wallet.on_menu_generate(keyboard)
     buyChance.on_menu_generate(keyboard)
+    getCurrentLottery.on_menu_generate(keyboard)
     
     reply_markup = InlineKeyboardMarkup(keyboard)
     if update.callback_query:
@@ -64,6 +65,8 @@ async def admin_panel(update: Update, context: CallbackContext):
     wallet.on_menu_generate(keyboard)
     sendToAll.on_menu_generate(keyboard)
     getTransactions.on_menu_generate(keyboard)
+    startLottery.on_menu_generate(keyboard)
+    getCurrentLottery.on_menu_generate(keyboard)
     
     reply_markup = InlineKeyboardMarkup(keyboard)
     message = update.callback_query if update.callback_query is not None else update.message

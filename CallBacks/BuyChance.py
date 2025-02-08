@@ -39,7 +39,7 @@ class BuyChance(BaseClassAction):
         with db.session_scope() as session:
             settings = session.query(Settings).one()
 
-            profileinfo = f"""هر شانس معادل 1TRON میباشد لطفا مبلغ معادل را به کیف پول زیر واریز نمایید:\nکیف پول:`{settings.walletAddress}`"""
+            profileinfo = f"""هر شانس معادل 1TRON میباشد لطفا مبلغ معادل را به کیف پول زیر واریز نمایید:\n\nکیف پول: `{settings.walletAddress}`"""
 
         await update.callback_query.edit_message_text(profileinfo, parse_mode=ParseMode.MARKDOWN_V2)
         
