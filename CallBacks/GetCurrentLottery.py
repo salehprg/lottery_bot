@@ -39,9 +39,9 @@ class GetCurrentLottery(BaseClassAction):
                 lottery_date = lottery.startDate
 
         if lottery_date is not None:
-            await update.callback_query.edit_message_text(f"Upcoming Lottery:\n\n{lottery_date.strftime('%Y/%m/%d %H:%M')}", parse_mode=ParseMode.MARKDOWN_V2)
+            await update.callback_query.edit_message_text(f"Upcoming Lottery:\n\n*{lottery_date.strftime('%Y/%m/%d %H:%M')}*", parse_mode=ParseMode.MARKDOWN_V2)
         else:
-            await update.callback_query.edit_message_text(f"Currently there isnt any Lottery!", parse_mode=ParseMode.MARKDOWN_V2)
+            await update.callback_query.edit_message_text(f"Currently there isnt any Lottery!")
         
         await self.cancel(update, context)
 
