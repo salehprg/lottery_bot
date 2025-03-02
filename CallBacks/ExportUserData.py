@@ -1,5 +1,6 @@
 from datetime import datetime
 import os
+import re
 import pandas as pd
 from telegram import CallbackQuery, InlineKeyboardButton, Update
 from CallBacks.BaseClass import BaseClassAction
@@ -10,24 +11,10 @@ from Domain.mapper import map_to_dto
 from Config import Configs
 
 class ExportUserData(BaseClassAction):
-    def __init__(self, step_conversation, callback_data):
+    def __init__(self, step_conversation, text_translates):
         super().__init__(step_conversation=step_conversation,
-                         callback_data=callback_data)
+                         text_translates=text_translates)
         
-        
-    def on_conv_step(self, steps : dict):
-        pass
-    
-    def create_handlers(self, application : Application, cancel):
-        self.cancel = cancel
-
-        application.add_handler(CallbackQueryHandler(self.on_query_receive, pattern=self.callback_pattern))
-
-    def on_menu_generate(self, keys : list):
-        wallet_key = [InlineKeyboardButton("Export User Data", callback_data=self.callback_data)]
-        
-        keys.append(wallet_key)
-        return keys
 
     async def on_query_receive(self,update: Update, context: CallbackContext):
         query = update.callback_query

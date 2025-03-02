@@ -108,3 +108,8 @@ class TRX_TronScan:
         print(f"New transactions {len(new_transactions)}")
 
         return settings, new_transactions
+    
+
+if __name__ == "__main__":
+    trx_payment = TRX_TronScan()
+    trx_payment.start_pulling()

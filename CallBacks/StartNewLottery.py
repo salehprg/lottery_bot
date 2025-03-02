@@ -10,20 +10,23 @@ from Database import db, Lottery
 from Config import Configs
 
 class StartNewLottery(BaseClassAction):
-    def __init__(self, step_conversation, callback_data):
+    def __init__(self, step_conversation, text_translates):
         super().__init__(step_conversation=step_conversation,
-                         callback_data=callback_data)
+                         text_translates=text_translates)
         
         self.agree_step = int(f"{self.step_conversation}1")
     
     def create_handlers(self, application : Application, cancel):
         self.cancel = cancel
 
+        regex_pattern = self.get_regex_pattern()
+        entry_handler = MessageHandler(filters.TEXT & ~filters.COMMAND & filters.Regex(regex_pattern), self.on_query_receive)
+
         states = {}
         states = self.on_conv_step(states)
 
         application.add_handler(ConversationHandler(
-            entry_points=[CallbackQueryHandler(self.on_query_receive, pattern=self.callback_pattern)],  # The conversation is triggered by the inline button, not a direct command
+            entry_points=[entry_handler],  # The conversation is triggered by the inline button, not a direct command
             states=states,
             fallbacks=[CallbackQueryHandler(self.cancel)],
             per_message=False
@@ -38,12 +41,7 @@ class StartNewLottery(BaseClassAction):
                 MessageHandler(filters.TEXT & ~filters.COMMAND, self.on_receive_agree),
             ]
         return steps
-        
-    def on_menu_generate(self, keys : list):
-        wallet_key = [InlineKeyboardButton("Start New Lottery", callback_data=self.callback_data)]
-        
-        keys.append(wallet_key)
-        return keys
+
 
     async def on_query_receive(self,update: Update, context: CallbackContext):
 
@@ -54,10 +52,10 @@ class StartNewLottery(BaseClassAction):
                 lottery_date = lottery.startDate
         
         if lottery_date is None:
-            await update.callback_query.edit_message_text("""Enter new Lottery Date:\nPlease use this format: *YYYY/MM/DD hh:mm*\nYYYY: Year\nMM: Month\nDD: Day\nhh: Hour\nmm: Minute""", parse_mode=ParseMode.MARKDOWN_V2)
+            await update.message.chat.send_message("""Enter new Lottery Date:\nPlease use this format: *YYYY/MM/DD hh:mm*\nYYYY: Year\nMM: Month\nDD: Day\nhh: Hour\nmm: Minute""", parse_mode=ParseMode.MARKDOWN_V2)
             return self.step_conversation
         else:
-            await update.callback_query.edit_message_text("Currently you have an upcoming lottery!\nYou cant add new lottery")
+            await update.message.chat.send_message("Currently you have an upcoming lottery!\nYou cant add new lottery")
             return ConversationHandler.END
         
 

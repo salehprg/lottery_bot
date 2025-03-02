@@ -1,3 +1,4 @@
+import re
 from telegram import CallbackQuery, InlineKeyboardButton, Update
 from CallBacks.BaseClass import BaseClassAction
 from telegram.ext import CallbackContext, MessageHandler, filters, Application, CallbackQueryHandler, ConversationHandler
@@ -7,9 +8,9 @@ from Database import db, User
 from Config import Configs
 
 class SendToAll(BaseClassAction):
-    def __init__(self, step_conversation, callback_data):
+    def __init__(self, step_conversation, text_translates):
         super().__init__(step_conversation=step_conversation,
-                         callback_data=callback_data)
+                         text_translates=text_translates)
         
     def on_conv_step(self, steps : dict):
         steps[self.step_conversation] = [
@@ -20,25 +21,23 @@ class SendToAll(BaseClassAction):
     
     def create_handlers(self, application : Application, cancel):
         self.cancel = cancel
-
+        
+        regex_pattern = self.get_regex_pattern()
+        entry_handler = MessageHandler(filters.TEXT & ~filters.COMMAND & filters.Regex(regex_pattern), self.on_query_receive)
+        
         states = {}
         states = self.on_conv_step(states)
-
+        
         application.add_handler(ConversationHandler(
-            entry_points=[CallbackQueryHandler(self.on_query_receive, pattern=self.callback_pattern)],  # The conversation is triggered by the inline button, not a direct command
+            entry_points=[entry_handler],  # The conversation is triggered by the inline button, not a direct command
             states=states,
             fallbacks=[CallbackQueryHandler(self.cancel)],
             per_message=False
         ))
-        
-    def on_menu_generate(self, keys : list):
-        keyboard = [InlineKeyboardButton("Send Message To All", callback_data=self.callback_data)]
-        
-        keys.append(keyboard)
-        return keys
+    
 
     async def on_query_receive(self,update: Update, context: CallbackContext):
-        await update.callback_query.edit_message_text("Enter your Message:")
+        await update.message.chat.send_message("Enter your Message:")
         
         return self.step_conversation
         

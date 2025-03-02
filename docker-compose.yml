@@ -1,7 +1,27 @@
 services:
   # Python Application Service
   tg_bot:
-    build: .
+    build:
+      context: .
+      dockerfile: Bot.Dockerfile
+    restart: always
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: 123456
+      DB_NAME: LotteryBotDB
+      TRON_SCAN_PRIOD: 60
+      SAVE_DIR_PATH: "/save_path"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  trx_scan:
+    build:
+      context: .
+      dockerfile: TRX.Dockerfile
     restart: always
     environment:
       DB_HOST: db

@@ -1,5 +1,6 @@
 from datetime import datetime
 import os
+import re
 import pandas as pd
 from telegram import CallbackQuery, InlineKeyboardButton, Update
 from CallBacks.BaseClass import BaseClassAction
@@ -13,25 +14,12 @@ from Config import Configs
 from Database import db, Settings, Transaction
 
 class GetTransactions(BaseClassAction):
-    def __init__(self, step_conversation, callback_data):
+    def __init__(self, step_conversation, text_translates):
         super().__init__(step_conversation=step_conversation,
-                         callback_data=callback_data)
+                         text_translates=text_translates)
 
         self.agree_step = int(f"{self.step_conversation}1")
-    
-    def create_handlers(self, application : Application, cancel):
-        self.cancel = cancel
 
-        application.add_handler(CallbackQueryHandler(self.on_query_receive, pattern=self.callback_pattern))
-        
-    def on_conv_step(self, steps : dict):
-        pass
-        
-    def on_menu_generate(self, keys : list):
-        wallet_key = [InlineKeyboardButton("Get Users Transactions", callback_data=self.callback_data)]
-        
-        keys.append(wallet_key)
-        return keys
 
     async def on_query_receive(self,update: Update, context: CallbackContext):
         
@@ -64,7 +52,7 @@ class GetTransactions(BaseClassAction):
         
         result_text = f"""Transactions information:\nTotal: {len(transactions_dto)}\nAmount: {total_amount}\nUnique Wallets: {len(unique_wallets)}"""
 
-        await update.callback_query.edit_message_text(result_text)
+        await update.message.chat.send_message(result_text)
 
         with open(file_path, "rb") as file:
             await update.callback_query.message.chat.send_document(file, caption="Transaction file")

@@ -4,15 +4,12 @@ import os
 import threading
 from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import ContextTypes, ConversationHandler,CallbackContext, CallbackQueryHandler, Application,CommandHandler
-from TRX_TronScan import TRX_TronScan
 from CallBacks import *
 from handlers import show_menu, start
 from Config import Configs
 from Database import db, Settings
 
 async def cancel(update: Update, context: ContextTypes) -> int:
-
-    await show_menu(update, context)
     return ConversationHandler.END
     
 def main():
@@ -42,6 +39,7 @@ def main():
     userData.create_handlers(application, cancel)
     startLottery.create_handlers(application, cancel)
     getCurrentLottery.create_handlers(application, cancel)
+    chooseLang.create_handlers(application, cancel)
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("menu", show_menu))
@@ -49,19 +47,10 @@ def main():
     print("Bot Started !")
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
-def start_pulling_trx():
-    trx_payment = TRX_TronScan()
-    trx_payment.start_pulling()
 
 if __name__ == "__main__":
-    
-    p = Process(target=start_pulling_trx)
-    p.start()
-
     while True:
         try:
             main()
         except Exception as ex:
             print(ex)
-
-    p.join()

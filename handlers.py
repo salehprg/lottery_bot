@@ -1,4 +1,4 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, ReplyKeyboardMarkup
 from telegram.ext import CallbackContext
 from Config import Configs
 from Database.database import db,User, Wallet
@@ -39,20 +39,22 @@ async def show_menu(update: Update, context: CallbackContext):
         await user_panel(update, context)
         
 async def user_panel(update: Update, context: CallbackContext):
-    # keyboard = [
-    #     [InlineKeyboardButton("Buy Lottery Ticket", callback_data=BUY_TICKET)],
-    #     [InlineKeyboardButton("Invite Friends", callback_data=INVITE),
-    #     InlineKeyboardButton("Check Remaining Time", callback_data=CHECK_TIME)],
-    # ]
-    
+
     keyboard =[]
     
-    userProfile.on_menu_generate(keyboard)
-    wallet.on_menu_generate(keyboard)
-    buyChance.on_menu_generate(keyboard)
-    getCurrentLottery.on_menu_generate(keyboard)
+    prof_btn = userProfile.on_menu_generate(context)
+    wallet_btn = wallet.on_menu_generate(context)
     
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    prof_btn.append(wallet_btn[0])
+    
+    keyboard.append(prof_btn)
+    keyboard.append(buyChance.on_menu_generate(context))
+    keyboard.append(getCurrentLottery.on_menu_generate(context))
+    keyboard.append(chooseLang.on_menu_generate(context))
+    
+    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
+    chooseLang.show_menu_func = user_panel
+    
     if update.callback_query:
         await update.callback_query.message.chat.send_message("Welcome to the User Panel. Choose an action:", reply_markup=reply_markup)
     else:
