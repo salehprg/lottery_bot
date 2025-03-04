@@ -38,6 +38,7 @@ services:
 
   # PostgreSQL Database Service
   db:
+    restart: always
     image: postgres:13  # Use the official PostgreSQL image
     ports:
       - "7654:5432"
