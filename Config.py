@@ -1,12 +1,17 @@
-# utils.py
-import os
-import pandas as pd
+from Database import db, Settings
 
 class Configs:
     save_path = ""
-    ADMIN_ID_LIST = []
-    TOKEN = "7809913716:AAHboDUMKA3hyEeMKLryIuNKIU_KR3s5ihk"
+    TOKEN = "7809913716:AAGB4fCSrXa1pYjpNndWfW23vGOhmc6OF_A"
 
     @staticmethod
     def is_admin(user_id):
-        return user_id in Configs.ADMIN_ID_LIST
+        
+        admin_list = []
+        with db.session_scope() as session:
+            settings = session.query(Settings).one_or_none()
+            if settings is not None:
+                for adminId in settings.adminIds:
+                    admin_list.append(adminId)
+
+        return user_id in admin_list

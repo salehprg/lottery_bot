@@ -18,12 +18,6 @@ def main():
     os.makedirs(save_path,exist_ok=True)
 
     Configs.save_path = save_path
-
-    with db.session_scope() as session:
-        settings = session.query(Settings).one_or_none()
-        if settings is not None:
-            for adminId in settings.adminIds:
-                Configs.ADMIN_ID_LIST.append(adminId)
     
     print("Starting...")
     application = Application.builder().token(Configs.TOKEN).build()
@@ -49,8 +43,4 @@ def main():
 
 
 if __name__ == "__main__":
-    while True:
-        try:
-            main()
-        except Exception as ex:
-            print(ex)
+    main()

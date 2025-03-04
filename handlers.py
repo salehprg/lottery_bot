@@ -3,7 +3,7 @@ from telegram.ext import CallbackContext
 from Config import Configs
 from Database.database import db,User, Wallet
 from CallBacks import *
-                    
+
 async def start(update: Update, context: CallbackContext):
     user_id = update.message.from_user.id
     
@@ -53,7 +53,6 @@ async def user_panel(update: Update, context: CallbackContext):
     keyboard.append(chooseLang.on_menu_generate(context))
     
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
-    chooseLang.show_menu_func = user_panel
     
     if update.callback_query:
         await update.callback_query.message.chat.send_message("Welcome to the User Panel. Choose an action:", reply_markup=reply_markup)
@@ -63,18 +62,20 @@ async def user_panel(update: Update, context: CallbackContext):
 async def admin_panel(update: Update, context: CallbackContext):
     keyboard = []
     
-    userData.on_menu_generate(keyboard)
-    wallet.on_menu_generate(keyboard)
-    sendToAll.on_menu_generate(keyboard)
-    getTransactions.on_menu_generate(keyboard)
-    startLottery.on_menu_generate(keyboard)
-    getCurrentLottery.on_menu_generate(keyboard)
+    keyboard.append(userData.on_menu_generate(context))
+    keyboard.append(wallet.on_menu_generate(context))
+    keyboard.append(sendToAll.on_menu_generate(context))
+    keyboard.append(getTransactions.on_menu_generate(context))
+    keyboard.append(startLottery.on_menu_generate(context))
+    keyboard.append(getCurrentLottery.on_menu_generate(context))
     
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
     message = update.callback_query if update.callback_query is not None else update.message
     
-    reply_markup = InlineKeyboardMarkup(keyboard)
     if update.callback_query:
         await update.callback_query.message.chat.send_message("Welcome to the Admin Panel. Choose an action:", reply_markup=reply_markup)
     else:
         await update.message.reply_text("Welcome to the Admin Panel. Choose an action:", reply_markup=reply_markup)
+
+
+chooseLang.show_menu_func = show_menu
