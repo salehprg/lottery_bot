@@ -17,7 +17,7 @@ async def cancel(update: Update, context: ContextTypes) -> int:
 def main():
     scheduler = BackgroundScheduler()
     # Schedule the job to run every 5 minutes using a cron expression.
-    scheduler.add_job(check_lottery, 'cron', minute='*/1')
+    scheduler.add_job(check_lottery, 'cron', minute='*/5')
     scheduler.start()
 
     save_path = os.getenv("SAVE_DIR_PATH", "./data")

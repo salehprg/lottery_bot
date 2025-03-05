@@ -1,8 +1,9 @@
+import os
 from Database import db, Settings
 
 class Configs:
     save_path = ""
-    TOKEN = "7648992316:AAHHGWLxM3zi7bpYG9tS0W-W_27blSy6yxk"
+    TOKEN = os.getenv("BOT_TOKEN", "7648992316:AAHHGWLxM3zi7bpYG9tS0W-W_27blSy6yxk") 
 
     @staticmethod
     def is_admin(user_id):

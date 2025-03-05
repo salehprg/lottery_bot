@@ -11,7 +11,7 @@ services:
       DB_USER: postgres
       DB_PASSWORD: 123456
       DB_NAME: LotteryBotDB
-      TRON_SCAN_PRIOD: 60
+      BOT_TOKEN: 7648992316:AAHHGWLxM3zi7bpYG9tS0W-W_27blSy6yxk
       SAVE_DIR_PATH: "/save_path"
     depends_on:
       - db
