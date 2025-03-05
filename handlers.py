@@ -42,13 +42,17 @@ async def user_panel(update: Update, context: CallbackContext):
 
     keyboard =[]
     
-    prof_btn = userProfile.on_menu_generate(context)
-    wallet_btn = wallet.on_menu_generate(context)
-    
-    prof_btn.append(wallet_btn[0])
-    
-    keyboard.append(prof_btn)
-    keyboard.append(buyChance.on_menu_generate(context))
+
+    prof_btn = userProfile.on_menu_generate(context)[0]
+    wallet_btn = wallet.on_menu_generate(context)[0]
+    user_section = [prof_btn, wallet_btn]
+    keyboard.append(user_section)
+
+    buycahnce_btn = buyChance.on_menu_generate(context)[0]
+    lottery_result_btn = viewLotteryResult.on_menu_generate(context)[0]
+    lottery_section = [buycahnce_btn, lottery_result_btn]
+    keyboard.append(lottery_section)
+
     keyboard.append(getCurrentLottery.on_menu_generate(context))
     keyboard.append(chooseLang.on_menu_generate(context))
     

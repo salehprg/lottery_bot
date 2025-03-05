@@ -8,12 +8,18 @@ from CallBacks import *
 from handlers import show_menu, start
 from Config import Configs
 from Database import db, Settings
+from apscheduler.schedulers.background import BackgroundScheduler
+from Scheduler.LotteryScheduler import check_lottery
 
 async def cancel(update: Update, context: ContextTypes) -> int:
     return ConversationHandler.END
     
 def main():
-    
+    scheduler = BackgroundScheduler()
+    # Schedule the job to run every 5 minutes using a cron expression.
+    scheduler.add_job(check_lottery, 'cron', minute='*/1')
+    scheduler.start()
+
     save_path = os.getenv("SAVE_DIR_PATH", "./data")
     os.makedirs(save_path,exist_ok=True)
 
@@ -34,6 +40,7 @@ def main():
     startLottery.create_handlers(application, cancel)
     getCurrentLottery.create_handlers(application, cancel)
     chooseLang.create_handlers(application, cancel)
+    viewLotteryResult.create_handlers(application, cancel)
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("menu", show_menu))

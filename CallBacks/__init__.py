@@ -7,6 +7,7 @@ from .GetTransactions import GetTransactions
 from .StartNewLottery import StartNewLottery
 from .GetCurrentLottery import GetCurrentLottery
 from .ChangeLanguage import ChangeLanguage
+from .ViewLotteryResult import ViewLotteryResult
 
 user_text_lang = {
     "en": {"caption" : "Export User Data"},
@@ -59,6 +60,10 @@ choose_lang_text_lang = {
            }
 }
 
+view_result = {
+    "en": {"caption" : "View Lottery History"},
+    "fa": {"caption" : "مشاهده نتایج قرعه کشی"}
+}
 
 # Creating objects with translated text
 userData = ExportUserData(1, user_text_lang)
@@ -70,3 +75,4 @@ getTransactions = GetTransactions(6, get_transactions_text_lang)
 startLottery = StartNewLottery(7, start_lottery_text_lang)
 getCurrentLottery = GetCurrentLottery(8, get_current_lottery_text_lang)
 chooseLang = ChangeLanguage(9, choose_lang_text_lang)
+viewLotteryResult = ViewLotteryResult(10, view_result)

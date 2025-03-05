@@ -15,6 +15,7 @@ class Lottery(Base):
     startDate = Column(DateTime(timezone=False))
     poolSize = Column(Double)
     userCount = Column(Integer)
+    winnerId = Column(UUID(as_uuid=True), nullable=True)
 
     users = relationship("LotteryUser", back_populates="lottery")
     
@@ -25,6 +26,7 @@ class LotteryUser(Base):
     userId = Column(UUID(as_uuid=True), ForeignKey('Users.id'), nullable=False)
     lotteryId = Column(UUID(as_uuid=True), ForeignKey('Lotteries.id'), nullable=False)
     ticketAmount = Column(Double)
+    buyDate = Column(DateTime(timezone=False), server_default=func.now())
     
     lottery = relationship("Lottery", back_populates="users")
     user = relationship("User", back_populates="lotteries")
