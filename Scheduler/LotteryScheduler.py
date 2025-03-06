@@ -1,18 +1,29 @@
+import asyncio
 from datetime import datetime
 import random
 import uuid
 from sqlalchemy import func
 from Database import db, Settings
-from Database.database import Lottery, LotteryUser
+from Database.database import Lottery, LotteryUser, User
+from telegram.constants import ParseMode
 
 # Assume these are your SQLAlchemy models and session
 # from models import Lottery, LotteryUser
 # from database import session
+message_template = ("🎉 تبریک! شما برنده شده‌اید! 🎉\n"
+            "👑 شما جایزه قرعه کشی تاریخ <strong>{lottery_date}</strong> را دریافت کردید.\n"
+            "🎁 حالا می‌توانید برای دریافت جایزه خود اقدام کنید!\n"
+            "🌟 شما خوش‌شانس‌ترین نفر در این قرعه‌کشی بودید!\n"
+            "💬 در صورت نیاز به کمک، به پشتیبانی ما پیام دهید. 😊")
 
-def check_lottery():
+async def send_message_to_winner(application, message, winner_telegram_id):
+
+    await application.bot.send_message(chat_id=winner_telegram_id, text=message, parse_mode=ParseMode.HTML)
+    
+def check_lottery(application):
     with db.session_scope() as session:
         lottery = session.query(Lottery)\
-            .filter(Lottery.startDate < datetime.now())\
+            .filter(Lottery.startDate < datetime.now(), Lottery.winnerId == None)\
             .order_by(Lottery.startDate.desc(), Lottery.winnerId != None).first()
         
         if lottery is None:
@@ -58,4 +69,8 @@ def check_lottery():
         lottery.poolSize = sum(weights)
         lottery.userCount = len(user_ids)
 
+        winner_user = session.query(User).filter_by(id=winner).one_or_none()
+
+        message = message_template.format(lottery_date=lottery.startDate.strftime('%Y/%m/%d %H:%M'))
+        asyncio.run(send_message_to_winner(application, message, winner_user.telegramId))
         print("Lottery winner is:", winner)

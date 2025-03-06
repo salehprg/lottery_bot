@@ -108,10 +108,20 @@ class Database:
                 settings.walletAddress = ""
                 settings.lastTimeStampPull = 0
                 settings.adminIds = []
-                
+
                 session.add(settings)
                 session.commit()
-                session.close()
+
+            exist_empty = session.query(User).filter_by(id=uuid.UUID(int=0)).one_or_none()
+            if exist_empty == None:
+                empty_user = User()
+                empty_user.id = uuid.UUID(int=0)
+                empty_user.telegramId = ""
+                
+                session.add(empty_user)
+                session.commit()
+
+            session.close()
             
             print(f"Database {database} initialized !")
     

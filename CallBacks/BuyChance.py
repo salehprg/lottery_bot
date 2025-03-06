@@ -40,9 +40,10 @@ class BuyChance(BaseClassAction):
         
         user_id = update.effective_user.id
         
-        walletAddress = None
+        mainwalletAddress = None
         current_chance = 0
         wallet_balance = 0
+        user_wallet_address = None
 
         with db.session_scope() as session:
             settings = session.query(Settings).one()
@@ -59,17 +60,19 @@ class BuyChance(BaseClassAction):
                                 userId=f"{exist_user.id}",
                                 lotteryId=f"{lottery.id}"
                             ).scalar()
-            walletAddress = settings.walletAddress
+                            
+            mainwalletAddress = settings.walletAddress
 
             session.refresh(exist_user)
             wallet_balance = exist_user.wallet[0].balance
 
-        message = (
-            f"هر شانس معادل 1TRON میباشد لطفا مبلغ معادل را به کیف پول زیر واریز نمایید:\n\n"
-            f"کیف پول: <code>{walletAddress}</code>\n"
-            f"شانس فعلی شما: <strong>{current_chance}</strong>\n\n"
-            f"موجودی کیف پول شما: <strong>{wallet_balance}</strong>\n"
-        )
+            if exist_user.wallet[0].current_walletaddress == None:
+                message_empty = self.get_text(context, "empty_wallet")
+                await update.message.chat.send_message(message_empty, parse_mode=ParseMode.HTML)
+                return ConversationHandler.END
+
+        message = self.get_text(context, "buy_chance").format(current_chance=current_chance, wallet_balance=wallet_balance)
+
         await update.message.chat.send_message(message, parse_mode=ParseMode.HTML)
         
         return self.step_conversation
@@ -124,12 +127,10 @@ class BuyChance(BaseClassAction):
             exist_user.wallet[0].balance -= chance_float
 
             lottery_date = lottery.startDate
-            total_chance = lottery_user.ticketAmount
+            total_chance = total_amount
 
-        message = (
-            f"You successfully bought chnace for lottery date <strong>{lottery_date.strftime('%Y/%m/%d %H:%M')}</strong>\n"
-            f"Your current chance is: <strong>{total_amount}</strong>"
-        )
+        message = self.get_text(context, "succed_buy").format(chance_float=chance_float, total_chance=total_chance)
+
         await update.message.reply_text(message, parse_mode=ParseMode.HTML)
         
         return ConversationHandler.END

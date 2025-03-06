@@ -24,7 +24,11 @@ class UserProfile(BaseClassAction):
                 session.refresh(user)
                 wallet = user.wallet[0]
 
-            profileinfo = f"""شماره کاربر: {user.telegramId}\nموجودی: {wallet.balance}"""
+            wallet_address = "N/A"
+            if wallet.current_walletaddress != None:
+                wallet_address = wallet.current_walletaddress
+
+            profileinfo = self.get_text(context, "profile").format(user_id= user.telegramId, balance=wallet.balance, wallet_address= wallet_address)
 
         await update.message.chat.send_message(profileinfo)
         

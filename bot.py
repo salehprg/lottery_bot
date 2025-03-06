@@ -15,11 +15,6 @@ async def cancel(update: Update, context: ContextTypes) -> int:
     return ConversationHandler.END
     
 def main():
-    scheduler = BackgroundScheduler()
-    # Schedule the job to run every 5 minutes using a cron expression.
-    scheduler.add_job(check_lottery, 'cron', minute='*/5')
-    scheduler.start()
-
     save_path = os.getenv("SAVE_DIR_PATH", "./data")
     os.makedirs(save_path,exist_ok=True)
 
@@ -44,6 +39,12 @@ def main():
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("menu", show_menu))
+
+
+    scheduler = BackgroundScheduler()
+    # Schedule the job to run every 5 minutes using a cron expression.
+    scheduler.add_job(check_lottery, 'cron', minute='*/1', args=[application])
+    scheduler.start()
 
     print("Bot Started !")
     application.run_polling(allowed_updates=Update.ALL_TYPES)

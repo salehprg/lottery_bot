@@ -67,6 +67,13 @@ class SetWallet(BaseClassAction):
 
                 if not Configs.is_admin(update.message.from_user.id):
                     user = session.query(User).filter_by(telegramId=f"{user_id}").one_or_none()
+                    wallet = session.query(Wallet).filter_by(current_walletaddress=f"{new_wallet_address}").first()
+
+                    if wallet !=None:
+                        message = self.get_text(context, "exist_wallet")
+                        await update.message.reply_text(message)
+                        return
+
                     if user != None:
                         wallet = session.query(Wallet).filter_by(userId=user.id).one_or_none()
                         wallet.current_walletaddress = new_wallet_address
