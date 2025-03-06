@@ -43,7 +43,7 @@ def main():
 
     scheduler = BackgroundScheduler()
     # Schedule the job to run every 5 minutes using a cron expression.
-    scheduler.add_job(check_lottery, 'cron', minute='*/1', args=[application])
+    scheduler.add_job(check_lottery, 'cron', minute='*/5', args=[application])
     scheduler.start()
 
     print("Bot Started !")
