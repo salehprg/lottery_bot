@@ -6,7 +6,7 @@ from Database import db, Settings, Transaction, Wallet
 from typing import List
 
 # Configuration
-TRONSCAN_API_URL = "https://shastapi.tronscan.org/api/trx/transfer"
+TRONSCAN_API_URL = "https://apilist.tronscan.org/api/trx/transfer"
 
 class TRX_TronScan:
     def __init__(self):
