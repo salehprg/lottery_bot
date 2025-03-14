@@ -6,6 +6,7 @@ from CallBacks import *
 
 async def start(update: Update, context: CallbackContext):
     user_id = update.message.from_user.id
+    username = update.message.from_user.username
     
     with db.session_scope() as session:
         exist_user = session.query(User).filter_by(telegramId=f"{user_id}").one_or_none()
@@ -18,6 +19,7 @@ async def start(update: Update, context: CallbackContext):
         
             new_user = User()
             new_user.telegramId = f"{user_id}"
+            new_user.telegramUsername = username
             new_user.inviteby_telegramId = refered_userId
             session.add(new_user)
             session.flush()
@@ -70,12 +72,18 @@ async def user_panel(update: Update, context: CallbackContext):
 async def admin_panel(update: Update, context: CallbackContext):
     keyboard = []
     
-    keyboard.append(userData.on_menu_generate(context))
-    keyboard.append(wallet.on_menu_generate(context))
+    excel = userData.on_menu_generate(context)[0]
+    setWallet = wallet.on_menu_generate(context)[0]
+    user_section = [excel, setWallet]
+    keyboard.append(user_section)
+
     keyboard.append(sendToAll.on_menu_generate(context))
     keyboard.append(getTransactions.on_menu_generate(context))
-    keyboard.append(startLottery.on_menu_generate(context))
-    keyboard.append(getCurrentLottery.on_menu_generate(context))
+
+    lottery = startLottery.on_menu_generate(context)[0]
+    currentLottery = getCurrentLottery.on_menu_generate(context)[0]
+    social_section = [lottery, currentLottery]
+    keyboard.append(social_section)
     
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
     message = update.callback_query if update.callback_query is not None else update.message
@@ -86,4 +94,8 @@ async def admin_panel(update: Update, context: CallbackContext):
         await update.message.reply_text("Welcome to the Admin Panel. Choose an action:", reply_markup=reply_markup)
 
 
+backHandle.show_menu_func = show_menu
 chooseLang.show_menu_func = show_menu
+sendToAll.show_menu_func = show_menu
+wallet.show_menu_func = show_menu
+startLottery.show_menu_func = show_menu

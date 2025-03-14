@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import re
 
-from telegram import CallbackQuery, InlineKeyboardButton, Update
+from telegram import CallbackQuery, InlineKeyboardButton, Update, ReplyKeyboardMarkup
 from telegram.ext import CallbackContext, Application, MessageHandler, filters
 
 class BaseClassAction(ABC):
@@ -11,6 +11,14 @@ class BaseClassAction(ABC):
         self.step_conversation = step_conversation
         self.text_translates = text_translates
         self.cancel = None
+        self.show_menu_func = None
+
+        self.back_text = "⬅️"
+        self.back_reply = ReplyKeyboardMarkup(keyboard=[[InlineKeyboardButton(self.back_text)]], resize_keyboard=True, one_time_keyboard=False)
+
+    async def show_menu(self, update, context):
+        if self.show_menu_func is not None:
+            await self.show_menu_func(update, context)
 
     def get_text(self, context, key : str = 'caption'):
         lang = context.user_data.get("lang", "en")
@@ -43,7 +51,7 @@ class BaseClassAction(ABC):
 
     def on_menu_generate(self, context : CallbackContext):
         text = self.get_text(context)
-        buttons = [InlineKeyboardButton(text)]
+        buttons = [InlineKeyboardButton(text, callback_data=self.step_conversation)]
         
         return buttons
 

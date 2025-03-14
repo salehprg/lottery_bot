@@ -10,7 +10,6 @@ class ChangeLanguage(BaseClassAction):
                          text_translates=text_translates)
         
         self.CHOOSE_LANGUAGE = 1
-        self.show_menu_func = None
     
     def create_handlers(self, application : Application, cancel):
         self.cancel = cancel
@@ -60,7 +59,6 @@ class ChangeLanguage(BaseClassAction):
         reply_text = self.get_text(context, "response_lang")
         await update.message.reply_text(reply_text)
         
-        if self.show_menu_func is not None:
-            await self.show_menu_func(update, context)
+        await self.show_menu(update, context)
             
         return ConversationHandler.END

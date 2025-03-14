@@ -42,16 +42,20 @@ class SetWallet(BaseClassAction):
         return steps
         
     async def on_query_receive(self,update: Update, context: CallbackContext):
-        await update.message.chat.send_message("Enter your wallet Address:")
+        await update.message.chat.send_message("Enter your wallet Address:", reply_markup=self.back_reply)
         
         return self.agree_step
 
     async def on_receive_agree(self,update: Update, context: CallbackContext):
-        new_wallet_address = update.message.text
+        message = update.message.text
         
-        context.user_data["wallet"] = new_wallet_address
+        if message == self.back_text:
+            await self.show_menu(update, context)
+            return ConversationHandler.END
         
-        await update.message.reply_text(f"Type OK to Update Wallet Address: {new_wallet_address}")
+        context.user_data["wallet"] = message
+        
+        await update.message.reply_text(f"Type OK to Update Wallet Address: {message}")
         
         return self.step_conversation
         
@@ -83,7 +87,6 @@ class SetWallet(BaseClassAction):
             
             await update.message.reply_text(f"Wallet address updated to {new_wallet_address}")
 
-        if self.cancel is not None:
-            return await self.cancel(update, context)
-        
+
+        await self.show_menu(update, context)
         return ConversationHandler.END

@@ -52,7 +52,7 @@ class StartNewLottery(BaseClassAction):
                 lottery_date = lottery.startDate
         
         if lottery_date is None:
-            await update.message.chat.send_message("""Enter new Lottery Date:\nPlease use this format: *YYYY/MM/DD hh:mm*\nYYYY: Year\nMM: Month\nDD: Day\nhh: Hour\nmm: Minute""", parse_mode=ParseMode.MARKDOWN_V2)
+            await update.message.chat.send_message("""Enter new Lottery Date:\nPlease use this format: *YYYY/MM/DD hh:mm*\nYYYY: Year\nMM: Month\nDD: Day\nhh: Hour\nmm: Minute""", parse_mode=ParseMode.MARKDOWN_V2, reply_markup=self.back_reply)
             return self.step_conversation
         else:
             await update.message.chat.send_message("Currently you have an upcoming lottery!\nYou cant add new lottery")
@@ -60,11 +60,13 @@ class StartNewLottery(BaseClassAction):
         
 
     async def on_receive_agree(self,update: Update, context: CallbackContext):
-
+        
+        message = update.message.text
+        
         lottery_date = context.user_data["lottery_date"]
         datetime_object = datetime.strptime(lottery_date, "%Y/%m/%d %H:%M")
 
-        if update.message.text == "OK":
+        if message == "OK":
             with db.session_scope() as session:
                 new_lottery = Lottery()
                 new_lottery.startDate = datetime_object
@@ -75,7 +77,8 @@ class StartNewLottery(BaseClassAction):
 
         await update.message.reply_text(f"Lottery Created !")
         
-        return self.step_conversation
+        await self.show_menu(update, context)
+        return ConversationHandler.END
     
     def is_valid_format(self, input_string):
         # Regular expression to match the format yyyy/mm/dd hh:mm
@@ -84,10 +87,16 @@ class StartNewLottery(BaseClassAction):
 
     async def on_receive_input(self,update: Update, context: CallbackContext):       
         
-        if self.is_valid_format(update.message.text):
-            context.user_data["lottery_date"] = update.message.text
+        message = update.message.text
 
-            await update.message.reply_text(f"Type OK to Create new lottery for entered date:\n{update.message.text}")
+        if message == self.back_text:
+            await self.show_menu(update, context)
+            return ConversationHandler.END
+
+        if self.is_valid_format(message):
+            context.user_data["lottery_date"] = message
+
+            await update.message.reply_text(f"Type OK to Create new lottery for entered date:\n{message}")
             return self.agree_step
         else:
             await update.message.reply_text(f"Enter in correct format please:\nyyyy/mm/dd hh:mm")

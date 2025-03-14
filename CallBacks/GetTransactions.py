@@ -55,7 +55,7 @@ class GetTransactions(BaseClassAction):
         await update.message.chat.send_message(result_text)
 
         with open(file_path, "rb") as file:
-            await update.callback_query.message.chat.send_document(file, caption="Transaction file")
+            await update.message.chat.send_document(file, caption="Transaction file")
 
         return self.agree_step
 

@@ -69,6 +69,7 @@ class User(Base):
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     telegramId = Column(String)
+    telegramUsername = Column(String, nullable=True)
     inviteby_telegramId = Column(String)
     joinDate = Column(DateTime(timezone=False), server_default=func.now())
     

@@ -26,7 +26,8 @@ class InviteFriend(BaseClassAction):
 
         await update.message.chat.send_message(invite_message, parse_mode=ParseMode.HTML)
         
-        return self.step_conversation
+        return ConversationHandler.END
+
         
     async def on_receive_input(self,update: Update, context: CallbackContext):
         pass

@@ -17,9 +17,8 @@ class ExportUserData(BaseClassAction):
         
 
     async def on_query_receive(self,update: Update, context: CallbackContext):
-        query = update.callback_query
-        
-        await query.edit_message_text("Exporting User Data...")
+
+        await update.message.chat.send_message("Exporting User Data...")
         
         users_dto = []  # Get your user data here
     
@@ -33,6 +32,7 @@ class ExportUserData(BaseClassAction):
         data = {
             "ID": [t.id for t in users_dto],
             "Telegram ID": [t.telegramId for t in users_dto],
+            "Telegram Username": [t.telegramUsername for t in users_dto],
             "Invite By ID": [t.inviteby_telegramId for t in users_dto],
             "Join Date": [t.joinDate for t in users_dto]
         }
@@ -45,10 +45,10 @@ class ExportUserData(BaseClassAction):
 
         result_text = f"""Users information:\nTotal: {len(users_dto)}\n"""
 
-        await query.edit_message_text(result_text)
+        await update.message.chat.send_message(result_text)
 
         with open(file_path, "rb") as file:
-            await query.message.chat.send_document(file, caption="Users file")
+            await update.message.chat.send_document(file, caption="Users file")
         
         return ConversationHandler.END
 

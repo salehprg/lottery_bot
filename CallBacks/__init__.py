@@ -9,6 +9,7 @@ from .GetCurrentLottery import GetCurrentLottery
 from .ChangeLanguage import ChangeLanguage
 from .ViewLotteryResult import ViewLotteryResult
 from .InviteFriend import InviteFriend
+from .BackHandle import BackHandle
 
 user_text_lang = {
     "en": {"caption" : "📥 Export User Data"},
@@ -129,6 +130,11 @@ friendInvite_lang = {
                            }
 }
 
+back_lang = {
+    "en": {"caption" : "⬅️"},
+    "fa": {"caption" : "⬅️"}
+}
+
 # Creating objects with translated text
 userData = ExportUserData(1, user_text_lang)
 wallet = SetWallet(2, wallet_text_lang)
@@ -141,3 +147,5 @@ getCurrentLottery = GetCurrentLottery(8, get_current_lottery_text_lang)
 chooseLang = ChangeLanguage(9, choose_lang_text_lang)
 viewLotteryResult = ViewLotteryResult(10, view_result)
 inviteFriend = InviteFriend(11, friendInvite_lang)
+inviteFriend = InviteFriend(11, friendInvite_lang)
+backHandle = BackHandle(12, back_lang)
