@@ -8,6 +8,7 @@ from .StartNewLottery import StartNewLottery
 from .GetCurrentLottery import GetCurrentLottery
 from .ChangeLanguage import ChangeLanguage
 from .ViewLotteryResult import ViewLotteryResult
+from .InviteFriend import InviteFriend
 
 user_text_lang = {
     "en": {"caption" : "📥 Export User Data"},
@@ -70,7 +71,7 @@ buy_chance_text_lang = {
                             "🎯 آرزوی موفقیت داریم و امیدواریم شانس با شما باشد!\n\n"
                             "شانس فعلی شما: {current_chance}\n"
                             "موجودی کیف پول شما: {wallet_balance}\n"),
-            "succed_buy" :("✅ پرداخت شما با موفقیت انجام شد!"
+            "succed_buy" :("✅ پرداخت شما با موفقیت انجام شد!\n"
                             "شما به تعداد {chance_float} شانس وارد قرعه‌کشی شدید. 🎉 \n"
                             "آرزو می‌کنیم که شانس با شما باشد! 🍀  \n"
                             "موفق باشید و به یاد داشته باشید: شانس در کنار شماست! 🌟\n\n"
@@ -113,6 +114,21 @@ view_result = {
     "fa": {"caption" : "🏆 مشاهده نتایج قرعه کشی"}
 }
 
+friendInvite_lang = {
+    "en": {"caption" : "🗣 Invite Friends",
+           "InviteText" : ("Use the link below to invite your friends\n\n"
+                           "Invite Link: <code>https://t.me/KismetRobot_bot?start={ref_code}</code>\n\n"
+                           "Currently invited users: {invite_user_count}"
+                           )
+           },
+    "fa": {"caption" : "🗣 دعوت از دوستان",
+           "InviteText" : ("با استفاده از لینک دعوت زیر دوستان خودرا دعوت کنید\n\n"
+                           "لینک دعوت: <code>https://t.me/KismetRobot_bot?start={ref_code}</code>\n\n"
+                            "افراد دعوت شده فعلی: {invite_user_count}"
+                           )
+                           }
+}
+
 # Creating objects with translated text
 userData = ExportUserData(1, user_text_lang)
 wallet = SetWallet(2, wallet_text_lang)
@@ -124,3 +140,4 @@ startLottery = StartNewLottery(7, start_lottery_text_lang)
 getCurrentLottery = GetCurrentLottery(8, get_current_lottery_text_lang)
 chooseLang = ChangeLanguage(9, choose_lang_text_lang)
 viewLotteryResult = ViewLotteryResult(10, view_result)
+inviteFriend = InviteFriend(11, friendInvite_lang)

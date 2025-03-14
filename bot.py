@@ -36,6 +36,7 @@ def main():
     getCurrentLottery.create_handlers(application, cancel)
     chooseLang.create_handlers(application, cancel)
     viewLotteryResult.create_handlers(application, cancel)
+    inviteFriend.create_handlers(application, cancel)
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("menu", show_menu))

@@ -54,7 +54,11 @@ async def user_panel(update: Update, context: CallbackContext):
     keyboard.append(lottery_section)
 
     keyboard.append(getCurrentLottery.on_menu_generate(context))
-    keyboard.append(chooseLang.on_menu_generate(context))
+
+    lang = chooseLang.on_menu_generate(context)[0]
+    invite = inviteFriend.on_menu_generate(context)[0]
+    social_section = [lang, invite]
+    keyboard.append(social_section)
     
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
     
